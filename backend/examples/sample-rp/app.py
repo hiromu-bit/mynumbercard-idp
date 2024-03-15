@@ -131,7 +131,7 @@ def token() -> str:
     return render_template("token.html")
 
 
-@app.route("/logout")
+@app.route("/login")
 def logout() -> Response:
     session.pop("user", None)
     return redirect("/")
