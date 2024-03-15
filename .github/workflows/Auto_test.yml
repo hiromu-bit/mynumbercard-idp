@@ -23,6 +23,7 @@ jobs:
           pip install flask
           pip install authlib
           pip install werkzeug
+          pip install requests
 
       - name: PyTest
         run: |
