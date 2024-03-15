@@ -28,23 +28,5 @@ jobs:
 
       - name: PyTest
         run: |
-          python -m pytest backend/examples/sample-rp/tests --junit-xml results/pytest.xml
+          python -m pytest backend/examples/sample-rp/tests
         continue-on-error: true
-
-      - name: Upload Unit Test Results
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: Unit Test Results (Python 3.11)
-          path: results/*.xml
-
-      - name: Download Artifacts
-        if: success() || failure()
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          junit_files: artifacts/**/*.xml
