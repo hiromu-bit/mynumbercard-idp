@@ -130,7 +130,7 @@ def account() -> str:
 def token() -> str:
     token = session.get("token")
     user = session.get("user")
-    return render_template("token.html", token=token, user=user)
+    return render_template("token.html")
 
 
 @app.route("/logout")
