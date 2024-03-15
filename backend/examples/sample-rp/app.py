@@ -128,12 +128,10 @@ def account() -> str:
 
 @app.route("/token")
 def token() -> str:
-    token = session.get("token")
-    user = session.get("user")
-    return render_template("token.html", token=token, user=user)
+    return render_template("token.html")
 
 
-@app.route("/logout")
+@app.route("/login")
 def logout() -> Response:
     session.pop("user", None)
     return redirect("/")
@@ -149,46 +147,3 @@ def refresh() -> str:
         )
         session["token"] = new_token
     return redirect(url_for("index"))
-
-
-@app.route("/replace", methods=["POST"])
-def replace() -> Response:
-    token: dict[str, str] | None = session.get("token")
-
-    if token is None:
-        abort(400, "Token not available")
-
-    replaceAPIURL = (
-        f'{os.getenv("KEYCLOAK_URL")}/realms/{os.getenv("KEYCLOAK_REALM")}/userinfo-replacement/login'
-        f'?redirect_uri={quote(os.getenv("BASE_URL") + "/refresh")}&scope=openid&response_type=code'
-    )
-
-    headers = {
-        "Content-type": "application/x-www-form-urlencoded",
-        "Authorization": f"Bearer {token['access_token']}",
-        "User-Agent": request.headers.get("User-Agent"),
-    }
-
-    response = requests.post(
-        replaceAPIURL,
-        headers=headers,
-        data={},
-        allow_redirects=False,
-    )
-
-    userinfo_response = requests.get(
-        f'{os.getenv("KEYCLOAK_URL")}/realms/{os.getenv("KEYCLOAK_REALM")}/protocol/openid-connect/userinfo',
-        headers={"Authorization": f"Bearer {token['access_token']}"},
-    )
-
-    if userinfo_response.status_code == 200:
-        userinfo = userinfo_response.json()
-        merged_userinfo = {**session.get("user", {}), **userinfo}
-        session["user"] = merged_userinfo
-        session["token"] = token
-
-    return redirect(response.headers["Location"])
-
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=3000)
