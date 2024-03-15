@@ -24,6 +24,7 @@ jobs:
           pip install authlib
           pip install werkzeug
           pip install requests
+          pip install pytest-mock
 
       - name: PyTest
         run: |
